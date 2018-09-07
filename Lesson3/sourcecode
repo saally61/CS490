@@ -17,7 +17,7 @@ LiquidCrystal_PCF8574 lcd(0x27);
 #define SSID "test"     // "SSID-WiFiname" 
 #define PASS "password"       // "password"
 #define IP "184.106.153.149"// thingspeak.com ip
-String msg = "GET /update?key=UCXC5E63ISD1L6JJ"; //change it with your api key like "GET /update?key=Your Api Key"
+String msg = "GET /update?key=UNY1U0MS4K5ZJQ8C"; //change it with your api key like "GET /update?key=Your Api Key"
 Adafruit_BMP280 bmp; // I2C
 
 int light;
@@ -45,19 +45,23 @@ void setup() {
   Serial.begin(115200); //or use default 115200.
   esp8266.begin(115200);
   lcd.clear();
-  delay(1000);
+  esp8266.println("AT");
+  delay(5000);
   lcd.print("Setting up...");
-  if(esp8266.find("OK")){
-    connectWiFi();
-  }
-
-  //interruptSetup();
-   dht.begin(); 
+  dht.begin(); 
   if (!bmp.begin()) {  
     Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
     while (1);
   }
   pinMode(6,INPUT);
+  
+  if(esp8266.find("OK")){
+    Serial.print("Connecting wifi");
+    connectWiFi();
+  }
+
+  //interruptSetup();
+   
 }
 
 void loop() {
@@ -95,7 +99,7 @@ void loop() {
     lcd.print("Temp: ");
     lcd.print(temp);
     lcd.print(" *C");
-    cmd += "&field2=";
+    cmd += "&field3=";
     cmd += temp;
     delay(1000);
 
@@ -113,45 +117,46 @@ void loop() {
  Vsig = sum*4980.0/1023.0; // Vsig is the value of voltage measured from the SIG pin of the Grove interface 
  String data = "";
 if (Vsig < 50) {
-    data = "UV Index: 0 "; 
+    data = "0"; 
  }
 if (Vsig > 50 && Vsig < 227) {
-    data= "UV Index: 1 "; 
+    data= "1"; 
 }
 if (Vsig > 227 && Vsig < 318) {
-    data= "UV Index: 2 "; 
+    data= "2"; 
  }
 if (Vsig > 318 && Vsig < 408) {
-    data= "UV Index: 3 ";
+    data= "3";
  }
 if (Vsig > 408 && Vsig < 503) {
-    data= "UV Index: 4 "; 
+    data= "4"; 
  }
 if (Vsig > 503 && Vsig < 606) {
-    data="UV Index: 5 "; 
+    data="5"; 
  }
 if (Vsig > 606 && Vsig < 696) {
-    data="UV Index: 6 "; 
+    data="6"; 
  }
 if (Vsig > 696 && Vsig < 795) {
-    data="UV Index: 7 ";
+    data="7";
  }
 if (Vsig > 795 && Vsig < 881) {
-    data="UV Index: 8 "; 
+    data="8"; 
  }
 if (Vsig > 881 && Vsig < 976) {
-    data="UV Index: 9 "; 
+    data="9"; 
  }
 if (Vsig > 976 && Vsig < 1079) {
-    data="UV Index: 10 "; 
+    data="10 "; 
  }
 if (Vsig > 1079 && Vsig < 1170) {
-    data="UV Index: 11 "; 
+    data="11"; 
 }
 if (Vsig > 1170) {
-    data="UV Index: 11+ ";
+    data="11+";
  }
- cmd += "&field3=";
+ lcd.print("UV Index:" + data);
+ cmd += "&field4=";
  cmd += data;
  delay(1000);
 
@@ -168,7 +173,7 @@ lcd.clear();
     lcd.println(" pcs/0.01cf");
     lowpulseoccupancy = 0;
     starttime = millis();
-    cmd += "&field4=";
+    cmd += "&field5=";
     cmd += concentration;
   }
    cmd += "\r\n";
