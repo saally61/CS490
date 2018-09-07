@@ -47,9 +47,9 @@ void setup() {
   lcd.clear();
   delay(1000);
   lcd.print("Setting up...");
-//  if(esp8266.find("OK")){
-//    connectWiFi();
-//  }
+  if(esp8266.find("OK")){
+    connectWiFi();
+  }
 
   //interruptSetup();
    dht.begin(); 
@@ -61,16 +61,31 @@ void setup() {
 }
 
 void loop() {
+    String cmd = "AT+CIPSTART=\"TCP\",\"";
+    cmd += IP;
+    cmd += "\",80";
+    Serial.println(cmd);
+    esp8266.println(cmd);
+    delay(1000);
+    if(esp8266.find("Error")){
+      return;
+    }
+    cmd = msg ;
+    
     lcd.clear();
     //lcd.print(F("Temp= ") + bmp.readTemperature());
     lcd.print("Baro:");
     lcd.print(bmp.readTemperature());
     lcd.print(" *C");
+    cmd += "&field1=";
+    cmd += bmp.readTemperature();
     delay(1000);
 
     lcd.clear();
-    light=analogRead(A0);
+    light=analogRead(A1);
     lcd.println("Light= " + String(light));
+    cmd += "&field2=";
+    cmd += String(light);
     delay(1000);
 
     lcd.clear();
@@ -80,6 +95,8 @@ void loop() {
     lcd.print("Temp: ");
     lcd.print(temp);
     lcd.print(" *C");
+    cmd += "&field2=";
+    cmd += temp;
     delay(1000);
 
     //uv sensor 
@@ -90,50 +107,52 @@ void loop() {
    {  
       sensorValue=analogRead(A0);
       sum=sensorValue+sum;
-      delay(2);
+      delay(1);
    }   
  sum = sum >> 10;
  Vsig = sum*4980.0/1023.0; // Vsig is the value of voltage measured from the SIG pin of the Grove interface 
+ String data = "";
 if (Vsig < 50) {
-    lcd.print("UV Index: 0 "); 
+    data = "UV Index: 0 "; 
  }
 if (Vsig > 50 && Vsig < 227) {
-    lcd.print("UV Index: 1 "); 
+    data= "UV Index: 1 "; 
 }
 if (Vsig > 227 && Vsig < 318) {
-    lcd.print("UV Index: 2 "); 
+    data= "UV Index: 2 "; 
  }
 if (Vsig > 318 && Vsig < 408) {
-    lcd.print("UV Index: 3 ");
+    data= "UV Index: 3 ";
  }
 if (Vsig > 408 && Vsig < 503) {
-    lcd.print("UV Index: 4 "); 
+    data= "UV Index: 4 "; 
  }
 if (Vsig > 503 && Vsig < 606) {
-    lcd.print("UV Index: 5 "); 
+    data="UV Index: 5 "; 
  }
 if (Vsig > 606 && Vsig < 696) {
-    lcd.print("UV Index: 6 "); 
+    data="UV Index: 6 "; 
  }
 if (Vsig > 696 && Vsig < 795) {
-    lcd.print("UV Index: 7 ");
+    data="UV Index: 7 ";
  }
 if (Vsig > 795 && Vsig < 881) {
-    lcd.print("UV Index: 8 "); 
+    data="UV Index: 8 "; 
  }
 if (Vsig > 881 && Vsig < 976) {
-    lcd.print("UV Index: 9 "); 
+    data="UV Index: 9 "; 
  }
 if (Vsig > 976 && Vsig < 1079) {
-    lcd.print("UV Index: 10 "); 
+    data="UV Index: 10 "; 
  }
 if (Vsig > 1079 && Vsig < 1170) {
-    lcd.print("UV Index: 11 "); 
+    data="UV Index: 11 "; 
 }
 if (Vsig > 1170) {
-    lcd.print("UV Index: 11+ ");
+    data="UV Index: 11+ ";
  }
- 
+ cmd += "&field3=";
+ cmd += data;
  delay(1000);
 
 lcd.clear();
@@ -149,6 +168,24 @@ lcd.clear();
     lcd.println(" pcs/0.01cf");
     lowpulseoccupancy = 0;
     starttime = millis();
+    cmd += "&field4=";
+    cmd += concentration;
+  }
+   cmd += "\r\n";
+  Serial.print("AT+CIPSEND=");
+  esp8266.print("AT+CIPSEND=");
+  Serial.println(cmd.length());
+  esp8266.println(cmd.length());
+
+  if(esp8266.find(">")){
+    Serial.print(cmd);
+    esp8266.print(cmd);
+  }
+  else{
+   Serial.println("AT+CIPCLOSE");
+   esp8266.println("AT+CIPCLOSE");
+    //Resend...
+   
   }
  delay(1000);
 }
