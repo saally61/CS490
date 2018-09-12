@@ -32,6 +32,10 @@ int wait_time = 1500;
 int pulsePin = A2;
 int blinkPin = 13;
 
+int LEDRed = 2;
+int LEDGreen = 3; 
+
+
 unsigned long duration;
 unsigned long starttime;
 unsigned long sampletime_ms = 2000; 
@@ -70,13 +74,18 @@ volatile int thresh = 525;                // used to find instant moment of hear
 volatile int amp = 100;                   // used to hold amplitude of pulse waveform, seeded
 volatile boolean firstBeat = true;        // used to seed rate array so we startup with reasonable BPM
 volatile boolean secondBeat = false;      // used to seed rate array so we startup with reasonable BPM
-  
+
+
+ 
 void setup() {
   //Analog Pins
   pinMode(Light_Pin,INPUT);
   //digital pins
   pinMode(Dust_Pin,INPUT);
   pinMode(blinkPin, OUTPUT);
+  pinMode(LEDRed, OUTPUT);
+  pinMode(LEDGreen, OUTPUT);
+  
   
   lcd.setBacklight(255); //clear lcd
   lcd.begin(16, 2);
@@ -107,59 +116,62 @@ void setup() {
 
 void loop() {
   //heart beat 
-   start: 
-  //baro sensor
-  b_temp = Get_Baro(0);
-  b_pres = Get_Baro(1);
-  b_alt = Get_Baro(2);
-  //light sensor
-  L_data = Get_Light();
-  //DHT sensor 
-  dht_hum = Get_Hum(0);
-  dht_temp = Get_Hum(1);
-  //UV sensor
-  uv_data = Get_UV();
-  //dust senor
-  dust_data = Get_Dust();
+   start:  
   
   lcd.clear();
-  lcd.print(b_temp); 
+  lcd.print(Get_Baro(0)); 
   lcd.setCursor(0,1);
-  lcd.print(b_pres); 
+  lcd.print(Get_Baro(1)); 
   delay(wait_time);
   lcd.clear();
-  lcd.print(b_alt);
+  lcd.print(Get_Baro(2));
   delay(wait_time);
+
+  
   //display light sensor
   lcd.clear();
-  lcd.print(L_data); 
+  lcd.print(Get_Light()); 
   delay(wait_time);
-  //display DHT sensor
 
+  
+  //display DHT sensor
   lcd.clear();
-  lcd.print(dht_hum); 
+  lcd.print(Get_Hum(0)); 
+  //lcd.print(dht_hum); 
   lcd.setCursor(0,1);
-  lcd.print(dht_temp);
+  lcd.print(Get_Hum(1));
   delay(wait_time);
+
 
   //Display UV sensor
   lcd.clear();
-  lcd.print(uv_data); 
+  lcd.print(Get_UV()); 
   delay(wait_time);
 
   //dust sensor 
   lcd.clear();
-  lcd.print(dust_data);
+  lcd.print(Get_Dust());
   delay(wait_time);
 
   //heartbeat sensor 
   lcd.clear();
+  if (BPM > 100){
+    digitalWrite(LEDRed, HIGH);
+    digitalWrite(LEDGreen, LOW);
+  }
+  else {
+    digitalWrite(LEDGreen, HIGH);
+    digitalWrite(LEDRed, LOW);
+    
+    }
   lcd.print("BPM: " + String(BPM));
   delay(wait_time);
 }
 
 String Get_Baro(int sensor_mode) {
   if(sensor_mode == 0){
+    digitalWrite(LEDRed, HIGH);
+    digitalWrite(LEDGreen, HIGH);
     return("B_Temp= " + String(round(bmp.readTemperature()))+ "C");
   }
   else if(sensor_mode == 1){
@@ -175,13 +187,30 @@ String Get_Baro(int sensor_mode) {
 
 String Get_Light() {
   light = analogRead(Light_Pin);
+  if (light > 10){
+    digitalWrite(LEDRed, HIGH);
+    digitalWrite(LEDGreen, LOW);
+    }
+  else{
+    digitalWrite(LEDGreen, HIGH);
+    digitalWrite(LEDRed, LOW);
+    }    
   return("Light= " + String(light));
 }
 
 String Get_Hum(int mode) {
   if(mode == 0){
     hum = dht.readHumidity();
-    return("Hum.: " + String(hum));
+    if (hum > 60){
+        digitalWrite(LEDRed, HIGH);
+        digitalWrite(LEDGreen, LOW);
+        return("DANGER Hum.: " + String(hum));
+    }
+    else {
+        digitalWrite(LEDGreen, HIGH);       
+        digitalWrite(LEDRed, LOW);
+        return("Hum.: " + String(hum));
+    }
   }
   else if(mode == 1){
     temp= dht.readTemperature();
@@ -242,6 +271,12 @@ String Get_UV()
     else if (Vsig > 1170) {
       data="11+";
     }
+    if (Vsig > 1170){
+      digitalWrite(LEDRed, HIGH);
+      digitalWrite(LEDGreen, LOW);}
+    else{
+      digitalWrite(LEDGreen, HIGH);
+      digitalWrite(LEDRed, LOW);}
     return("UV Index:" + data);
 }
 String Get_Dust(){
@@ -253,6 +288,14 @@ String Get_Dust(){
     concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; 
     lowpulseoccupancy = 0;
     starttime = millis();
+    if (concentration > 10){
+        digitalWrite(LEDRed, HIGH);
+        digitalWrite(LEDGreen, LOW);
+      }
+    else {
+        digitalWrite(LEDGreen, HIGH);
+        digitalWrite(LEDRed, LOW);
+      }    
     return("Dust: " +String(concentration/0.01) + " pcs/cf");
   }
 }
