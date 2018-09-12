@@ -106,6 +106,8 @@ void setup() {
 }
 
 void loop() {
+  //heart beat 
+   start: 
   //baro sensor
   b_temp = Get_Baro(0);
   b_pres = Get_Baro(1);
@@ -115,6 +117,10 @@ void loop() {
   //DHT sensor 
   dht_hum = Get_Hum(0);
   dht_temp = Get_Hum(1);
+  //UV sensor
+  uv_data = Get_UV();
+  //dust senor
+  dust_data = Get_Dust();
   
   lcd.clear();
   lcd.print(b_temp); 
@@ -136,20 +142,17 @@ void loop() {
   lcd.print(dht_temp);
   delay(wait_time);
 
-  //UV sensor
-  uv_data = Get_UV();
+  //Display UV sensor
   lcd.clear();
   lcd.print(uv_data); 
   delay(wait_time);
 
   //dust sensor 
-  dust_data = Get_Dust();
   lcd.clear();
   lcd.print(dust_data);
   delay(wait_time);
 
   //heartbeat sensor 
-  start: 
   lcd.clear();
   lcd.print("BPM: " + String(BPM));
   delay(wait_time);
@@ -359,4 +362,3 @@ ISR(TIMER2_COMPA_vect){                       // triggered when Timer2 counts to
   sei();     
   // enable interrupts when youre done!
 }// end isr
-
