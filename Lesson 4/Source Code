@@ -1,0 +1,1 @@
+[{"id":"bff86450.a0b438","type":"function","z":"827b5c28.226f7","name":"extractTwitterMessage","func":"text = msg.payload.description;\nmsg.payload = \"Saally \" + text;\nreturn msg;","outputs":1,"noerr":0,"x":530,"y":220,"wires":[["51bccf3a.830a3","3d4e862f.cb5f6a","ec84178.4401ce8"]]}]
