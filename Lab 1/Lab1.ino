@@ -49,14 +49,14 @@ float hum;  //Stores humidity value
 float temp; //Stores temperature value
 float Vsig;
 
-String b_temp;
-String b_pres;
-String b_alt;
-String L_data;
-String dht_hum;
-String dht_temp;
-String uv_data;
-String dust_data;
+double b_temp;
+double b_pres;
+double b_alt;
+int L_data;
+double dht_hum;
+double dht_temp;
+int uv_data;
+double dust_data;
 
 // Volatile Variables, used in the interrupt service routine!
 volatile int BPM;                   // int that holds raw Analog in 0. updated every 2mS
@@ -128,60 +128,141 @@ void loop() {
   if(switchState == LOW){
       //heart beat 
      start:  
+
     
     b_temp = Get_Baro(0);
-    print_Data("Barometer Temp.:",b_temp + (char)223+"C");
+    if (b_temp > 32){
+      digitalWrite(LEDRed, HIGH); //Red Light
+      digitalWrite(LEDGreen, LOW);
+      print_Data("BaroTemp.:", "DANGER: " + String(b_temp) + (char)223+"C");
+    }
+    else{
+      digitalWrite(LEDGreen, HIGH); //Green Light
+      digitalWrite(LEDRed, LOW);
+      print_Data("BaroTemp.:", String(b_temp) + (char)223+"C");
+    }
+
     
     b_pres = Get_Baro(1); 
-    print_Data("Barometer Pres.:", b_pres + " KPa"); 
+    if (b_pres > 100){
+      digitalWrite(LEDRed, HIGH); //Red Light
+      digitalWrite(LEDGreen, LOW);
+      print_Data("BaroPres.:", "DANGER: "+String(b_pres) + " KPa"); 
+    }
+    else{
+      digitalWrite(LEDGreen, HIGH); //Green Light
+      digitalWrite(LEDRed, LOW);
+      print_Data("BaroPres.:", String(b_pres) + " KPa"); 
+    }
+
     
     b_alt = Get_Baro(2);
-    print_Data("Barometer alt.:", b_alt + " m");
+    if (b_alt > 200){
+      digitalWrite(LEDRed, HIGH); //Red Light
+      digitalWrite(LEDGreen, LOW);
+      print_Data("BaroAlt.:", "DANGER: "+String(b_alt) + " m");
+    }
+    else{
+      digitalWrite(LEDGreen, HIGH); //Green Light
+      digitalWrite(LEDRed, LOW);
+      print_Data("BaroAlt.:", String(b_alt) + " m");
+    }
+    
 
     
     //display light sensor
     L_data = Get_Light();
-    print_Data("Light:", L_data);
+    if (L_data > 800){
+      digitalWrite(LEDRed, HIGH); //Red Light
+      digitalWrite(LEDGreen, LOW);
+      print_Data("Light:", "DANGER: "+String(L_data));
+    }
+    else{
+      digitalWrite(LEDGreen, HIGH); //Green Light
+      digitalWrite(LEDRed, LOW);
+      print_Data("Light:", String(L_data));
+    } 
   
     
     //display DHT sensor
-    dht_hum = Get_Hum(0); 
-    print_Data("Humitidy:" , dht_hum);
+    dht_hum = Get_Hum(0);
+    if (dht_hum > 60) {
+      digitalWrite(LEDRed, HIGH); //Red Light
+      digitalWrite(LEDGreen, LOW);
+      print_Data("Humitidy:" , "DANGER: "+String(dht_hum));
+    }
+    else{
+      digitalWrite(LEDGreen, HIGH); //Green Light
+      digitalWrite(LEDRed, LOW);
+      print_Data("Humitidy:" , String(dht_hum));
+    } 
 
     dht_temp = Get_Hum(1);
-    print_Data("Temperature:" , dht_temp  +(char)223+ "C");
+    if (dht_temp > 32) {
+      digitalWrite(LEDRed, HIGH); //Red Light
+      digitalWrite(LEDGreen, LOW);
+      print_Data("Temperature:" , "DANGER: "+String(dht_temp)  +(char)223+ "C");
+    }
+    else{
+      digitalWrite(LEDGreen, HIGH); //Green Light
+      digitalWrite(LEDRed, LOW);    
+      print_Data("Temperature:" , String(dht_temp)  +(char)223+ "C");
+    } 
+    
   
     //Display UV sensor
     uv_data = Get_UV();
-    print_Data("UV Index:" , uv_data);
+    if (uv_data > 11) {
+      digitalWrite(LEDRed, HIGH); //Red Light
+      digitalWrite(LEDGreen, LOW);
+      print_Data("UV Index:" , "DANGER: 11+");
+    }
+    else{
+      digitalWrite(LEDGreen, HIGH); //Green Light
+      digitalWrite(LEDRed, LOW);    
+      print_Data("UV Index:" , String(uv_data));
+    } 
   
     //dust sensor 
     dust_data = Get_Dust();
-    print_Data("Dust:", dust_data+" pcs/cf");
+    if (dust_data > 50) {
+      digitalWrite(LEDRed, HIGH); //Red Light
+      digitalWrite(LEDGreen, LOW);
+      print_Data("Dust:", "DANGER: "+String(dust_data)+" pcs/cf");
+    }
+    else{
+      digitalWrite(LEDGreen, HIGH); //Green Light
+      digitalWrite(LEDRed, LOW);    
+      print_Data("Dust:", String(dust_data)+" pcs/cf");
+    } 
   
     //heartbeat sensor 
     if (BPM > 100){
-      digitalWrite(LEDRed, HIGH);
+      digitalWrite(LEDRed, HIGH); //Red Light
       digitalWrite(LEDGreen, LOW);
+      print_Data("BPM:", "DANGER: "+String(BPM));
     }
     else {
-      digitalWrite(LEDGreen, HIGH);
+      digitalWrite(LEDGreen, HIGH); //Green Light
       digitalWrite(LEDRed, LOW);
-      
+      print_Data("BPM:", String(BPM));
       }
+
+      
+    digitalWrite(LEDGreen, HIGH);
+    digitalWrite(LEDRed, HIGH);
     
-    print_Data("BPM:", String(BPM));
     lcd.clear();
     lcd.print("Setting up data...");
     //delay(5000);
-    String sending_data = "&field1=" + b_temp
-    + "&field2="+ b_pres
-    + "&field3=" + b_alt 
+    String sending_data = "&field1=" + String(b_temp)
+    + "&field2="+ String(b_pres)
+    + "&field3=" + String(b_alt) 
     + "&field4=" + L_data 
-    + "&field5=" + dht_hum 
-    + "&field6=" + dht_temp
-    + "&field7=" + uv_data
-    + "&field8=" + dust_data
+    + "&field5=" + String(dht_hum) 
+    + "&field6=" + String(dht_temp)
+    + "&field7=" + String(uv_data)
+    + "&field8=" + String(dust_data)
     + "&field9=" + BPM
 ;
     delay(2000);
@@ -269,78 +350,40 @@ void print_Data(String line1, String line2){
   delay(wait_time);
 }
 
-String Get_Baro(int sensor_mode) {
+double Get_Baro(int sensor_mode) {
   if(sensor_mode == 0){
     int temp1 = round(bmp.readTemperature());
-    if(temp1 >= 32){
-      digitalWrite(LEDRed, HIGH);
-      digitalWrite(LEDGreen, LOW);
-    }
-    else{
-      digitalWrite(LEDRed, LOW);
-      digitalWrite(LEDGreen, HIGH);
-    }
-    return(String(temp1));
+    return(temp1);
   }
   else if(sensor_mode == 1){
-    digitalWrite(LEDRed, HIGH);
-    digitalWrite(LEDGreen, LOW);
-    return(String(0.001*round(bmp.readPressure()))); 
+    return(0.001*round(bmp.readPressure())); 
   }
   else if(sensor_mode == 2){
-    digitalWrite(LEDRed, HIGH);
-    digitalWrite(LEDGreen, LOW);
-    return(String(round(bmp.readAltitude(1013.25))));
+    return(round(bmp.readAltitude(1013.25)));
   }
   else{
-    return("Null");
+    return(NULL);
   }
 }
 
-String Get_Light() {
-  light = analogRead(Light_Pin);
-  if (light > 10){
-    digitalWrite(LEDRed, LOW);
-    digitalWrite(LEDGreen, HIGH);
-    }
-  else{
-    digitalWrite(LEDGreen, HIGH);
-    digitalWrite(LEDRed, LOW);
-    }    
-  return(String(light));
+int Get_Light() {
+  light = analogRead(Light_Pin);   
+  return(light);
 }
 
-String Get_Hum(int mode) {
+double Get_Hum(int mode) {
   if(mode == 0){
     hum = dht.readHumidity();
-    if (hum > 60){
-        digitalWrite(LEDRed, HIGH);
-        digitalWrite(LEDGreen, LOW);
-        //return("DANGER Hum.: " + String(hum));
-    }
-    else {
-        digitalWrite(LEDGreen, HIGH);       
-        digitalWrite(LEDRed, LOW);
-        //return("Hum.: " + String(hum));
-    }
-    return(String(hum));
+    return(hum);
   }
   else if(mode == 1){
     temp= dht.readTemperature();
-    if(temp >= 32){
-      digitalWrite(LEDRed, HIGH);
-      digitalWrite(LEDGreen, LOW);
-    }
-    else{
-      digitalWrite(LEDRed, LOW);
-      digitalWrite(LEDGreen, HIGH);
-    }
-    return(String(temp));
+    return(temp);
   }
-  else{return ("Null");}  
+  else{return (NULL);}  
 }
 
-String Get_UV()
+int Get_UV()
 {
   int sensorValue;
   long sum = 0;
@@ -352,55 +395,49 @@ String Get_UV()
    }   
    sum = sum >> 10;
    Vsig = sum*4980.0/1023.0; // Vsig is the value of voltage measured from the SIG pin of the Grove interface 
-   String data = "";
+   int data = 0; 
    if (Vsig < 50) {
-    data = "0"; 
+    data = 0; 
     }
     if (Vsig > 50 && Vsig < 227) {
-      data= "1"; 
+      data= 1; 
     }
     else if (Vsig > 227 && Vsig < 318) {
-      data= "2"; 
+      data= 2; 
     }
     else if (Vsig > 318 && Vsig < 408) {
-      data= "3";
+      data= 3;
     }
     else if (Vsig > 408 && Vsig < 503) {
-      data= "4"; 
+      data= 4; 
     }
     else if (Vsig > 503 && Vsig < 606) {
-      data="5"; 
+      data=5; 
     }
     else if (Vsig > 606 && Vsig < 696) {
-      data="6"; 
+      data=6; 
     }
     else if (Vsig > 696 && Vsig < 795) {
-      data="7";
+      data=7;
     }
     else if (Vsig > 795 && Vsig < 881) {
-      data="8"; 
+      data=8; 
     }
     else if (Vsig > 881 && Vsig < 976) {
-      data="9"; 
+      data=9; 
     }
     else if (Vsig > 976 && Vsig < 1079) {
-      data="10 "; 
+      data=10; 
     }
     else if (Vsig > 1079 && Vsig < 1170) {
-      data="11"; 
+      data=11; 
     }
     else if (Vsig > 1170) {
-      data="11+";
+      data=12;
     }
-    if (Vsig > 1170){
-      digitalWrite(LEDRed, HIGH);
-      digitalWrite(LEDGreen, LOW);}
-    else{
-      digitalWrite(LEDGreen, HIGH);
-      digitalWrite(LEDRed, LOW);}
     return(data);
 }
-String Get_Dust(){
+double Get_Dust(){
   duration = pulseIn(Dust_Pin, LOW);
   lowpulseoccupancy = lowpulseoccupancy+duration;
   if ((millis()-starttime) >= sampletime_ms) //if the sampel time = = 30s
@@ -409,15 +446,7 @@ String Get_Dust(){
     concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; 
     lowpulseoccupancy = 0;
     starttime = millis();
-    if (concentration > 10){
-        digitalWrite(LEDRed, HIGH);
-        digitalWrite(LEDGreen, LOW);
-      }
-    else {
-        digitalWrite(LEDGreen, HIGH);
-        digitalWrite(LEDRed, LOW);
-      }    
-    return(String(concentration/0.01));
+    return(concentration/0.01);
   }
 }
 
