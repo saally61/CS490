@@ -10,8 +10,8 @@ SoftwareSerial esp8266(9,10);
 //definitions
 #define DHTPIN 7     // what pin we're connected to
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
-#define SSID "Campos"     // "SSID-WiFiname" 
-#define PASS "e9YYWWaF2u41LlIrarmKh"       // "password"
+#define SSID "test"     // "SSID-WiFiname" 
+#define PASS "password"       // "password"
 #define IP "184.106.153.149"// thingspeak.com ip
 
 
