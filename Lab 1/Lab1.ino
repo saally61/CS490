@@ -10,10 +10,9 @@ SoftwareSerial esp8266(9,10);
 //definitions
 #define DHTPIN 7     // what pin we're connected to
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
-#define SSID "test"     // "SSID-WiFiname" 
-#define PASS "password"       // "password"
-#define IP "184.106.153.149"// thingspeak.com ip
-
+#define SSID "Campos"     // "SSID-WiFiname" 
+#define PASS "e9YYWWaF2u41LlIrarmKh"       // "password"
+#define IP "184.106.153.149";// thingspeak.com
 
 //sensors and devices
 DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
@@ -21,7 +20,7 @@ LiquidCrystal_PCF8574 lcd(0x27);
 Adafruit_BMP280 bmp; // I2C
 
 //variables
-String msg = "GET /update?key=UCXC5E63ISD1L6JJ"; //change it with your api key like "GET /update?key=Your Api Key"
+String msg = "GET /update?api_key=E3LOUGETJN19RSI4"; //change it with your api key like "GET /update?key=Your Api Key"
 int switchState = 0;
 int light; 
 int Light_Pin = A1;
@@ -36,7 +35,6 @@ int buttonPin = 4;
 int LEDRed = 2;
 int LEDGreen = 3; 
 boolean connection = false;
-
 
 unsigned long duration;
 unsigned long starttime;
@@ -77,8 +75,6 @@ volatile int amp = 100;                   // used to hold amplitude of pulse wav
 volatile boolean firstBeat = true;        // used to seed rate array so we startup with reasonable BPM
 volatile boolean secondBeat = false;      // used to seed rate array so we startup with reasonable BPM
 
-
- 
 void setup() {
   //Analog Pins
   pinMode(Light_Pin,INPUT);
@@ -98,39 +94,29 @@ void setup() {
   esp8266.begin(115200);
   lcd.clear();
   esp8266.println("AT");
-
+  //setup wifi
   delay(5000);
   lcd.print("Setting up...");
   if(esp8266.find("OK")){
     Serial.print("Connecting wifi");
     connectWiFi();
   }
-
-
   dht.begin(); 
   if (!bmp.begin()) {  
     Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
     while (1);
   }
 
-  
-  //set up wifi
-if(esp8266.find("OK")){
-    Serial.print("Connecting wifi");
-    connectWiFi();
-  }
-  delay(1000);
   interruptSetup();
 }
 
 void loop() {
   switchState = digitalRead(buttonPin);
   if(switchState == LOW){
-      //heart beat 
-     start:  
-
-    
+    //start heart beatsensor
+    start:      
     b_temp = Get_Baro(0);
+    //check values and respond
     if (b_temp > 32){
       digitalWrite(LEDRed, HIGH); //Red Light
       digitalWrite(LEDGreen, LOW);
@@ -141,7 +127,6 @@ void loop() {
       digitalWrite(LEDRed, LOW);
       print_Data("BaroTemp.:", String(b_temp) + (char)223+"C");
     }
-
     
     b_pres = Get_Baro(1); 
     if (b_pres > 100){
@@ -167,9 +152,7 @@ void loop() {
       digitalWrite(LEDRed, LOW);
       print_Data("BaroAlt.:", String(b_alt) + " m");
     }
-    
 
-    
     //display light sensor
     L_data = Get_Light();
     if (L_data > 800){
@@ -254,18 +237,16 @@ void loop() {
     
     lcd.clear();
     lcd.print("Setting up data...");
-    //delay(5000);
     String sending_data = "&field1=" + String(b_temp)
     + "&field2="+ String(b_pres)
     + "&field3=" + String(b_alt) 
     + "&field4=" + L_data 
     + "&field5=" + String(dht_hum) 
-    + "&field6=" + String(dht_temp)
-    + "&field7=" + String(uv_data)
-    + "&field8=" + String(dust_data)
-    + "&field9=" + BPM
+    + "&field6=" + String(uv_data)
+    + "&field7=" + String(dust_data)
+    + "&field8=" + BPM
 ;
-    delay(2000);
+
     lcd.clear();
     lcd.print("Sending data");
     send_data(sending_data);
@@ -280,6 +261,7 @@ void loop() {
 }
 
 void send_data(String data_to_send){
+  Serial.println("Data to send: " + data_to_send);
   String cmd = "AT+CIPSTART=\"TCP\",\"";
   cmd += IP;
   cmd += "\",80";
