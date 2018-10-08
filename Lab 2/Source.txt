@@ -1,0 +1,624 @@
+[
+    {
+        "id": "28a0129e.2c9cde",
+        "type": "tab",
+        "label": "Flow 2",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "8b57adb6.34ef5",
+        "type": "twitter out",
+        "z": "28a0129e.2c9cde",
+        "twitter": "",
+        "name": "Tweet",
+        "x": 1270,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "888220df.3f91d",
+        "type": "e-mail",
+        "z": "28a0129e.2c9cde",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "secure": true,
+        "name": "ocampossoto1@gmail.com",
+        "dname": "",
+        "x": 1220,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "2e03da2c.245916",
+        "type": "function",
+        "z": "28a0129e.2c9cde",
+        "name": "Extract Light Data",
+        "func": "\nvar light_value = msg.payload;\n\nmsg.payload = light_value;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 750,
+        "y": 240,
+        "wires": [
+            [
+                "1f226bbb.eee8b4"
+            ]
+        ]
+    },
+    {
+        "id": "1f226bbb.eee8b4",
+        "type": "join",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": true,
+        "timeout": "",
+        "count": "4",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 970,
+        "y": 300,
+        "wires": [
+            [
+                "b3cd5a8f.510578",
+                "554b15b0.85e33c"
+            ]
+        ]
+    },
+    {
+        "id": "ee5fa3e3.fb792",
+        "type": "function",
+        "z": "28a0129e.2c9cde",
+        "name": "Set topic",
+        "func": "msg.topic = \"Light\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 580,
+        "y": 240,
+        "wires": [
+            [
+                "2e03da2c.245916"
+            ]
+        ]
+    },
+    {
+        "id": "b3cd5a8f.510578",
+        "type": "function",
+        "z": "28a0129e.2c9cde",
+        "name": "Format data",
+        "func": "var data = msg.payload;\nif(data.Send){\n    msg.payload = \"This is a IoT Bot posting at\" + data.timestamp + \"\\nLight Value: \" + data.Light + \"\\nPulse: \" + data.pulse;\n    \n    }\n    else{\n        msg = null;\n    }\n    return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1010,
+        "y": 360,
+        "wires": [
+            [
+                "e77666e8.4b15a8",
+                "554b15b0.85e33c"
+            ]
+        ]
+    },
+    {
+        "id": "497d8a34.50ed74",
+        "type": "arduino in",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "pin": "0",
+        "state": "ANALOG",
+        "arduino": "56e814bf.d682dc",
+        "x": 150,
+        "y": 200,
+        "wires": [
+            [
+                "9d9feed0.f01ee",
+                "7b452ec3.8fd79"
+            ]
+        ]
+    },
+    {
+        "id": "ca94ec03.f68d8",
+        "type": "arduino in",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "pin": "1",
+        "state": "ANALOG",
+        "arduino": "56e814bf.d682dc",
+        "x": 130,
+        "y": 260,
+        "wires": [
+            [
+                "1c2afe56.c3ca62"
+            ]
+        ]
+    },
+    {
+        "id": "f87d8486.d6cae8",
+        "type": "counter",
+        "z": "28a0129e.2c9cde",
+        "name": "counter",
+        "init": "0",
+        "step": "1",
+        "lower": "",
+        "upper": "",
+        "mode": "increment",
+        "outputs": "2",
+        "x": 400,
+        "y": 360,
+        "wires": [
+            [
+                "cfc966f.879ed98"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "bf2c992e.fd6898",
+        "type": "function",
+        "z": "28a0129e.2c9cde",
+        "name": "reset",
+        "func": "msg.reset=true\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 390,
+        "y": 300,
+        "wires": [
+            [
+                "f87d8486.d6cae8"
+            ]
+        ]
+    },
+    {
+        "id": "cfc966f.879ed98",
+        "type": "delay",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "pauseType": "queue",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 600,
+        "y": 360,
+        "wires": [
+            [
+                "bf2c992e.fd6898",
+                "c395e6b6.2c4ee8"
+            ]
+        ]
+    },
+    {
+        "id": "c395e6b6.2c4ee8",
+        "type": "function",
+        "z": "28a0129e.2c9cde",
+        "name": "Incease to BPM",
+        "func": "msg.payload = msg.payload*6;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 600,
+        "y": 300,
+        "wires": [
+            [
+                "a0aebf69.fde52",
+                "39b69db9.7b8912",
+                "ad985663.cae9c8"
+            ]
+        ]
+    },
+    {
+        "id": "b7307798.68e098",
+        "type": "rbe",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "func": "deadbandEq",
+        "gap": "10",
+        "start": "",
+        "inout": "in",
+        "property": "payload",
+        "x": 220,
+        "y": 360,
+        "wires": [
+            [
+                "f87d8486.d6cae8"
+            ]
+        ]
+    },
+    {
+        "id": "1c2afe56.c3ca62",
+        "type": "delay",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "2",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 210,
+        "y": 320,
+        "wires": [
+            [
+                "b7307798.68e098"
+            ]
+        ]
+    },
+    {
+        "id": "a0aebf69.fde52",
+        "type": "function",
+        "z": "28a0129e.2c9cde",
+        "name": "set topic ",
+        "func": "msg.topic =\"pulse\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 780,
+        "y": 300,
+        "wires": [
+            [
+                "1f226bbb.eee8b4"
+            ]
+        ]
+    },
+    {
+        "id": "554b15b0.85e33c",
+        "type": "debug",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 1190,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "c51dc9e8.1f06e8",
+        "type": "inject",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "10",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "10",
+        "x": 430,
+        "y": 160,
+        "wires": [
+            [
+                "7b916941.82e628"
+            ]
+        ]
+    },
+    {
+        "id": "253b088d.278f88",
+        "type": "function",
+        "z": "28a0129e.2c9cde",
+        "name": "extract date",
+        "func": "var date = new Date(msg.payload);\nmsg.payload = (date.getMonth()+1).toString() + \" \"+ date.getDate().toString()+\" \"+ date.toString().slice(11,15) +\" at \"+ date.toString().slice(16,21);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 770,
+        "y": 160,
+        "wires": [
+            [
+                "1f226bbb.eee8b4"
+            ]
+        ]
+    },
+    {
+        "id": "7b916941.82e628",
+        "type": "function",
+        "z": "28a0129e.2c9cde",
+        "name": "set topic ",
+        "func": "msg.topic =\"timestamp\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 600,
+        "y": 160,
+        "wires": [
+            [
+                "253b088d.278f88"
+            ]
+        ]
+    },
+    {
+        "id": "9d9feed0.f01ee",
+        "type": "delay",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 300,
+        "y": 260,
+        "wires": [
+            [
+                "ee5fa3e3.fb792"
+            ]
+        ]
+    },
+    {
+        "id": "39b69db9.7b8912",
+        "type": "ui_gauge",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "group": "d1ee4d0d.7f927",
+        "order": 0,
+        "width": "6",
+        "height": "6",
+        "gtype": "wave",
+        "title": "Pulse",
+        "label": " BPM",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "220",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 810,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "290ca4bb.a4a1dc",
+        "type": "ui_chart",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "group": "d1ee4d0d.7f927",
+        "order": 0,
+        "width": "16",
+        "height": "6",
+        "label": "Light ",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "0",
+        "ymax": "",
+        "removeOlder": "30",
+        "removeOlderPoints": "500",
+        "removeOlderUnit": "1",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "x": 530,
+        "y": 200,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "b04ec586.06f5b8",
+        "type": "ui_audio",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "group": "d1ee4d0d.7f927",
+        "voice": "en-US",
+        "always": "",
+        "x": 1240,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "eba7053.f3434f8",
+        "type": "function",
+        "z": "28a0129e.2c9cde",
+        "name": "set topic ",
+        "func": "msg.topic =\"Send\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 800,
+        "y": 440,
+        "wires": [
+            [
+                "1f226bbb.eee8b4",
+                "554b15b0.85e33c"
+            ]
+        ]
+    },
+    {
+        "id": "2ee55e9a.6345b2",
+        "type": "ui_switch",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "label": "Post and speak?",
+        "group": "d1ee4d0d.7f927",
+        "order": 0,
+        "width": "6",
+        "height": "2",
+        "passthru": true,
+        "decouple": "false",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 610,
+        "y": 440,
+        "wires": [
+            [
+                "eba7053.f3434f8"
+            ]
+        ]
+    },
+    {
+        "id": "5859511b.908ec",
+        "type": "ui_toast",
+        "z": "28a0129e.2c9cde",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "topic": "",
+        "name": "",
+        "x": 1290,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "7b452ec3.8fd79",
+        "type": "delay",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "2",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 350,
+        "y": 200,
+        "wires": [
+            [
+                "290ca4bb.a4a1dc"
+            ]
+        ]
+    },
+    {
+        "id": "e77666e8.4b15a8",
+        "type": "delay",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "30",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1060,
+        "y": 420,
+        "wires": [
+            [
+                "5859511b.908ec",
+                "b04ec586.06f5b8",
+                "8b57adb6.34ef5",
+                "888220df.3f91d"
+            ]
+        ]
+    },
+    {
+        "id": "ad985663.cae9c8",
+        "type": "ui_chart",
+        "z": "28a0129e.2c9cde",
+        "name": "",
+        "group": "d1ee4d0d.7f927",
+        "order": 0,
+        "width": "10",
+        "height": "4",
+        "label": "Pulse Chart",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "mm:ss",
+        "interpolate": "linear",
+        "nodata": "Waiting for data...",
+        "dot": true,
+        "ymin": "0",
+        "ymax": "",
+        "removeOlder": "3",
+        "removeOlderPoints": "500",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "x": 810,
+        "y": 380,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "56e814bf.d682dc",
+        "type": "arduino-board",
+        "z": "",
+        "device": "COM9"
+    },
+    {
+        "id": "d1ee4d0d.7f927",
+        "type": "ui_group",
+        "z": "",
+        "name": "Default",
+        "tab": "33caca3e.f74b76",
+        "disp": true,
+        "width": "16",
+        "collapse": false
+    },
+    {
+        "id": "33caca3e.f74b76",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Home",
+        "icon": "dashboard"
+    }
+]
