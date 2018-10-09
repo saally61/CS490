@@ -69,8 +69,7 @@
         "y": 300,
         "wires": [
             [
-                "b3cd5a8f.510578",
-                "554b15b0.85e33c"
+                "b3cd5a8f.510578"
             ]
         ]
     },
@@ -95,15 +94,14 @@
         "type": "function",
         "z": "28a0129e.2c9cde",
         "name": "Format data",
-        "func": "var data = msg.payload;\nif(data.Send){\n    msg.payload = \"This is a IoT Bot posting at\" + data.timestamp + \"\\nLight Value: \" + data.Light + \"\\nPulse: \" + data.pulse;\n    \n    }\n    else{\n        msg = null;\n    }\n    return msg;",
+        "func": "var data = msg.payload;\nif(data.Send){\n    msg.payload = \"This is a IoT Bot posting at \" + data.timestamp + \"\\nLight Value: \" + data.Light + \"\\nPulse: \" + data.pulse;\n    \n    }\n    else{\n        msg = null;\n    }\n    return msg;",
         "outputs": 1,
         "noerr": 0,
         "x": 1010,
         "y": 360,
         "wires": [
             [
-                "e77666e8.4b15a8",
-                "554b15b0.85e33c"
+                "e77666e8.4b15a8"
             ]
         ]
     },
@@ -285,7 +283,7 @@
         "console": false,
         "tostatus": false,
         "complete": "false",
-        "x": 1190,
+        "x": 1210,
         "y": 200,
         "wires": []
     },
@@ -456,8 +454,7 @@
         "y": 440,
         "wires": [
             [
-                "1f226bbb.eee8b4",
-                "554b15b0.85e33c"
+                "1f226bbb.eee8b4"
             ]
         ]
     },
@@ -552,7 +549,8 @@
                 "5859511b.908ec",
                 "b04ec586.06f5b8",
                 "8b57adb6.34ef5",
-                "888220df.3f91d"
+                "888220df.3f91d",
+                "554b15b0.85e33c"
             ]
         ]
     },
