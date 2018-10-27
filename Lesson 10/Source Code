@@ -1,0 +1,41 @@
+// Starting of Program
+
+#include "DHT.h"
+
+#define DHTPIN 12     // tempreture sensor pin
+#define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
+
+int led = 7; //led pin
+char val;
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup()
+{
+
+//pinMode(led, OUTPUT);  // Digital pin 13 set as output Pin
+Serial.begin(9600);
+dht.begin();
+}
+
+void loop()
+{
+  delay(1000);
+  float f = dht.readTemperature(true); // Read temperature as Fahrenheit (isFahrenheit = true)
+  
+  while (Serial.available() > 0)
+  {
+  val = Serial.read();
+  }
+  
+  if( val == '1') // Forward
+    {
+      digitalWrite(led, HIGH);
+    }
+  else if(val == '2') // Backward
+    {
+      digitalWrite(led, LOW);
+    }
+  Serial.print(f);
+}
+
+// End of program
