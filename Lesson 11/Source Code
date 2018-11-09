@@ -1,0 +1,103 @@
+#include <SoftwareSerial.h>
+#define DEBUG true
+SoftwareSerial esp8266(11,12); 
+#include <LiquidCrystal.h>
+#include <stdlib.h>
+
+#define SSID "test"     // "SSID-WiFiname" 
+#define PASS "password1"       // "password"
+#define IP "192.168.43.88"// thingspeak.com ip
+String msg = "GET /message?message="; //change it with your api key like "GET /update?key=Your Api Key"
+
+//Variables
+  int error;
+  bool isConnected = false;
+// Volatile Variables, used in the interrupt service routine!
+
+// Regards Serial OutPut  -- Set This Up to your needs
+
+void setup()
+{
+ 
+  delay(100);
+ 
+  Serial.begin(9600); //or use default 115200.
+  esp8266.begin(9600);
+  
+  delay(5000);
+
+
+}
+
+void loop(){
+
+  if (isConnected){
+    sendMessage();
+    delay (5000);
+  }
+  else{
+    Serial.println("AT");
+    esp8266.println("AT");
+    if(esp8266.find("OK")){
+      isConnected = connectWiFi();
+      }
+    }
+}
+
+void sendMessage(){
+  String cmd = "AT+CIPSTART=\"TCP\",\"";
+  cmd += IP;
+  cmd += "\",1880";
+  Serial.println(cmd);
+  esp8266.println(cmd);
+  delay(2000);
+  if(esp8266.find("Error")){
+    return;
+  }
+  cmd = msg ;
+  cmd += "Hello";
+  cmd += "\r\n";
+  Serial.print("AT+CIPSEND=");
+  esp8266.print("AT+CIPSEND=");
+  Serial.println(cmd.length());
+  esp8266.println(cmd.length());
+  if(esp8266.find(">")){
+    Serial.print(cmd);
+    esp8266.print(cmd);
+  }
+  else{
+   Serial.println("AT+CIPCLOSE");
+   esp8266.println("AT+CIPCLOSE");
+    //Resend...
+    error=1;
+  }
+}
+
+boolean connectWiFi(){
+  Serial.println("AT+CWMODE=1");
+  esp8266.println("AT+CWMODE=1");
+  delay(2000);
+  String cmd="AT+CWJAP=\"";
+  cmd+=SSID;
+  cmd+="\",\"";
+  cmd+=PASS;
+  cmd+="\"";
+  Serial.println(cmd);
+  esp8266.println(cmd);
+  delay(5000);
+  if(esp8266.find("OK")){
+    Serial.println("OK");
+    return true;    
+  }else{
+    return false;
+  }
+}
+
+void interruptSetup(){     
+  TCCR2A = 0x02;     // DISABLE PWM ON DIGITAL PINS 3 AND 11, AND GO INTO CTC MODE
+  TCCR2B = 0x06;     // DON'T FORCE COMPARE, 256 PRESCALER 
+  OCR2A = 0X7C;      // SET THE TOP OF THE COUNT TO 124 FOR 500Hz SAMPLE RATE
+  TIMSK2 = 0x02;     // ENABLE INTERRUPT ON MATCH BETWEEN TIMER2 AND OCR2A
+  sei();             // MAKE SURE GLOBAL INTERRUPTS ARE ENABLED      
+} 
+
