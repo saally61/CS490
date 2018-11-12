@@ -1,1 +1,78 @@
+#include <SoftwareSerial.h>
+#include "DHT.h"
+SoftwareSerial esp8266(9,10); 
 
+#define SSID "test"     // "SSID-WiFiname" 
+#define PASS "password"       // "password"
+#define IP "192.168.1.10"// Ip of the raspberry pi
+#define DHTPIN 12
+#define DHTTYPE DHT22
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup()
+{
+  dht.begin(); // start dht sensor
+  delay(2000);
+  Serial.begin(115200);
+  esp8266.begin(115200);
+  Serial.println("AT");
+  esp8266.println("AT");
+  delay(1000);
+  if(esp8266.find("OK")){
+    connectWiFi();
+  }
+}
+
+void loop(){
+  updatebeat();
+  delay(8000); 
+}
+
+void updatebeat(){
+  String cmd = "AT+CIPSTART=\"TCP\",\"";
+  cmd += IP;
+  cmd += "\",5000";
+  Serial.println(cmd);
+  esp8266.println(cmd);
+  delay(2000);
+  if(esp8266.find("Error")){
+    Serial.print("error");
+    return;
+  }
+  float f = dht.readTemperature(true);
+  cmd = f;
+  Serial.print("AT+CIPSEND=");
+  esp8266.print("AT+CIPSEND=");
+  Serial.println(cmd.length());
+  esp8266.println(cmd.length());
+  if(esp8266.find(">")){
+    Serial.print(cmd);
+    esp8266.print(cmd);
+    Serial.print(" sending...");
+  }
+  else{
+   Serial.println("AT+CIPCLOSE");
+   esp8266.println("AT+CIPCLOSE");
+   Serial.print(" Resend...");
+  }
+}
+
+boolean connectWiFi(){
+  Serial.println("AT+CWMODE=1");
+  esp8266.println("AT+CWMODE=1");
+  delay(2000);
+  String cmd="AT+CWJAP=\"";
+  cmd+=SSID;
+  cmd+="\",\"";
+  cmd+=PASS;
+  cmd+="\"";
+  Serial.println(cmd);
+  esp8266.println(cmd);
+  delay(5000);
+  if(esp8266.find("OK")){
+    Serial.println("OK");
+    return true;    
+  }else{
+    return false;
+  }
+}
