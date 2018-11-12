@@ -1,0 +1,105 @@
+[
+    {
+        "id": "ad35097f.1196e8",
+        "type": "tab",
+        "label": "Flow 1 oscar",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "4da988e1.42a7b8",
+        "type": "tcp in",
+        "z": "ad35097f.1196e8",
+        "name": "",
+        "server": "server",
+        "host": "",
+        "port": "5000",
+        "datamode": "stream",
+        "datatype": "utf8",
+        "newline": "",
+        "topic": "",
+        "base64": false,
+        "x": 343,
+        "y": 410,
+        "wires": [
+            [
+                "254a657a.14618a"
+            ]
+        ]
+    },
+    {
+        "id": "7cc16888.7ef0d8",
+        "type": "debug",
+        "z": "ad35097f.1196e8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 677,
+        "y": 410,
+        "wires": []
+    },
+    {
+        "id": "1682f0ab.d8d1ff",
+        "type": "http response",
+        "z": "ad35097f.1196e8",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 710,
+        "y": 329,
+        "wires": []
+    },
+    {
+        "id": "3bdebd90.bc4c72",
+        "type": "http in",
+        "z": "ad35097f.1196e8",
+        "name": "",
+        "url": "/sensor",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 362,
+        "y": 325,
+        "wires": [
+            [
+                "fd82f1dc.50aa6"
+            ]
+        ]
+    },
+    {
+        "id": "fd82f1dc.50aa6",
+        "type": "function",
+        "z": "ad35097f.1196e8",
+        "name": "",
+        "func": "x = flow.get('value');\nmsg.payload = x;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 547,
+        "y": 327,
+        "wires": [
+            [
+                "1682f0ab.d8d1ff",
+                "7cc16888.7ef0d8"
+            ]
+        ]
+    },
+    {
+        "id": "254a657a.14618a",
+        "type": "function",
+        "z": "ad35097f.1196e8",
+        "name": "",
+        "func": "x = msg.payload;\nflow.set(\"value\", x);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 501,
+        "y": 414,
+        "wires": [
+            [
+                "7cc16888.7ef0d8"
+            ]
+        ]
+    }
+]
