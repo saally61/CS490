@@ -1,21 +1,27 @@
 import requests
+import json
 class MyClass(GeneratedClass):
     def __init__(self):
         GeneratedClass.__init__(self)
+
     def onLoad(self):
         #put initialization code here
         pass
+
     def onUnload(self):
         #put clean-up code here
         pass
+
     def onInput_onStart(self):
         #self.onStopped() #activate the output of the box
-        url="http://api.openweathermap.org/data/2.5/weather?q=kansas,us&mode=json&units=metric&APPID=c13804bd024d1d6fa4ab4c0d10f4cd02"
+        url="http://api.openweathermap.org/data/2.5/weather?q=kansas,us&mode=json&units=metric&APPID=9b6021c70054af62698dc2fc35bf2fd0"
         response=requests.request("POST", url)
         data=response.json()
-        result=data['weather'][0]['description']
+        result= "The weather today is " + data['weather'][0]['description'] + ". with a low of " + str(data['main']['temp_min']) + " and a high of " +  str(data['main']['temp_max'])+ "."
         tts=ALProxy("ALTextToSpeech")
         tts.say(str(result))
+        print(result)
+        pass
 
     def onInput_onStop(self):
         self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
